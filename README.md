@@ -20,6 +20,7 @@ mysql2: Database driver for SQL queries .
 4. Database Structure
 
 Users Table
+
 id : Primary Key
 name : Full name 
 email : Unique email 
