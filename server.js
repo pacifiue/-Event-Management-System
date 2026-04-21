@@ -76,6 +76,7 @@ app.post('/api/auth/login', async (req, res) => {
         // store the user in session
         req.session.user = { id: result.id, name: result.name, email: result.email };
         res.status(200).send({ Message: "Login successfully" });
+        
     } catch (error) {
         res.status(500).send({ Message: "Internal server error" });
     }
@@ -96,18 +97,23 @@ app.get('/api/auth/me', isAuthenticated, (req, res) => {
 //  EVENT ROUTES
 
 // Create Event 
+// Updated Create Event Route
 app.post('/api/events', isAuthenticated, async (req, res) => {
-    const { title, description, location, date } = req.body; 
+    
+    const { title, description, location, event_date } = req.body; 
     try {
-        const sql = "INSERT INTO events (title, description, location, date, user_id) VALUES (?, ?, ?, ?, ?)";
-        await db.query(sql, [title, description, location, date, req.session.user.id]);
-        res.status(201).send({ Message: "Event created" });
+        
+        const sql = "INSERT INTO events (title, description, location, event_date, user_id) VALUES (?, ?, ?, ?, ?)";
+        
+        await db.query(sql, [title, description, location, event_date, req.session.user.id]);
+        
+        res.status(201).send({ Message: "Event created successfully" });
     } catch (error) {
-        res.status(500).send({ Message: "Error creating event" });
+        console.error("Database Error:", error.message); 
+        res.status(500).send({ Message: "Error creating event", Error: error.message });
     }
 });
-
-// Get all events 
+// Get all events
 app.get('/api/events', isAuthenticated, async (req, res) => {
     const [events] = await db.query("SELECT * FROM events WHERE user_id = ?", [req.session.user.id]);
     res.status(200).send(events);
